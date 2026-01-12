@@ -83,14 +83,17 @@ export default async function ImageViewPage({ params }: any) {
     console.log(`[ViewPage] Tracking visit...`);
     await trackVisit(mockRequest, link._id);
 
-    // Mark as used
-    console.log(`[ViewPage] Marking as used...`);
-    const updateResult = await LinkModel.findByIdAndUpdate(
+    // Increment usage
+    console.log(`[ViewPage] Incrementing usage...`);
+    const updatedLink = await LinkModel.findByIdAndUpdate(
       link._id,
-      { used: true },
+      {
+        $inc: { usageCount: 1 },
+        $set: { used: link.usageCount + 1 >= (link.maxUses || 3) },
+      },
       { new: true }
     );
-    console.log(`[ViewPage] Update result:`, updateResult);
+    console.log(`[ViewPage] New usage count: ${updatedLink.usageCount}`);
   }
 
   return (

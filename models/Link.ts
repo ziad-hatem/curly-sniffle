@@ -19,6 +19,14 @@ const LinkSchema = new Schema({
     type: Boolean,
     default: false,
   },
+  usageCount: {
+    type: Number,
+    default: 0,
+  },
+  maxUses: {
+    type: Number,
+    default: 3,
+  },
 });
 
 // Force model recompilation in dev to pick up schema changes
