@@ -79,8 +79,13 @@ export async function GET(
       lon: v.geo?.lon,
       time: v.createdAt,
       device: v.ua?.device?.type || "Desktop",
-      os: v.ua?.os?.name,
-      browser: v.ua?.browser?.name,
+      os: v.ua?.os?.name
+        ? `${v.ua.os.name} ${v.ua.os.version || ""}`.trim()
+        : "Unknown",
+      browser: v.ua?.browser?.name
+        ? `${v.ua.browser.name} ${v.ua.browser.version || ""}`.trim()
+        : "Unknown",
+      ua: v.uaString || "N/A", // Expose raw UA
     }));
 
     return NextResponse.json({

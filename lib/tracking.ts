@@ -21,7 +21,10 @@ export async function trackVisit(request: Request, linkId: string) {
         browser: uaResult.browser,
         os: uaResult.os,
         device: uaResult.device,
+        cpu: uaResult.cpu,
+        engine: uaResult.engine,
       },
+      uaString: userAgent,
       referrer,
     });
   } catch (err) {

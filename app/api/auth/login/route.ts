@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   try {
+    // Handling login request
     const body = await request.json();
     const { password } = body;
 
@@ -22,9 +23,11 @@ export async function POST(request: Request) {
 
       return response;
     } else {
+      console.warn("Login failed: Invalid password.");
       return NextResponse.json({ error: "Invalid password" }, { status: 401 });
     }
   } catch (error) {
+    console.error("Login Route Error:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

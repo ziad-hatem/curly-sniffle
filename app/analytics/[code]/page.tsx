@@ -37,6 +37,7 @@ type AnalyticsData = {
   locations: { name: string; value: number }[];
   devices: { name: string; value: number }[];
   browsers: { name: string; value: number }[];
+  os: { name: string; value: number }[];
   recentVisits: any[];
   targetUrl: string;
   used: boolean;
@@ -141,10 +142,10 @@ export default function AnalyticsPage({
             }
           />
           <Card
-            label="Top Device"
-            value={data.devices[0]?.name || "-"}
+            label="Top OS"
+            value={data.os[0]?.name || "-"}
             icon={<Smartphone className="text-orange-500" />}
-            subValue={data.devices[0] ? `${data.devices[0].value} visits` : ""}
+            subValue={data.os[0] ? `${data.os[0].value} visits` : ""}
           />
         </div>
 
@@ -218,9 +219,9 @@ export default function AnalyticsPage({
           </div>
         </div>
 
-        {/* 3-Col Details Grid */}
+        {/* Details Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <ListCard title="Devices" items={data.devices} />
+          <ListCard title="Operating Systems" items={data.os} />
           <ListCard title="Browsers" items={data.browsers} />
           <ListCard title="Recent Activity" items={null}>
             <div className="space-y-4">
@@ -236,7 +237,16 @@ export default function AnalyticsPage({
                     </span>
                   </div>
                   <div className="text-zinc-500 text-xs mt-1">
-                    {v.city}, {v.country} • {v.device}
+                    {v.city}, {v.country}
+                  </div>
+                  <div className="text-zinc-500 text-xs mt-0.5">
+                    {v.os} • {v.browser}
+                  </div>
+                  <div
+                    className="text-zinc-400 text-[10px] mt-1 truncate"
+                    title={v.ua}
+                  >
+                    {v.ua}
                   </div>
                 </div>
               ))}

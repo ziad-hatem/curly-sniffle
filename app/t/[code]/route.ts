@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import Link from "@/models/Link";
 import { trackVisit } from "@/lib/tracking";
+import { isBot } from "@/lib/bot-detection";
 
 export async function GET(
   request: Request,
@@ -36,12 +37,20 @@ export async function GET(
       );
     }
 
-    // 2. Mark as used IMMEDIATELY to prevent double access
-    // Using updateOne to minimize race conditions window
+    // 2. Check for Bots
+    const userAgent = request.headers.get("user-agent");
+    if (isBot(userAgent)) {
+      // Allow bots to pass through (or not), but DO NOT mark as used
+      // Usually bots just want to scrape metadata from the destination if it's a redirect,
+      // OR if this route *is* the destination for them.
+      // If we redirect them, they will go to destination.
+      return NextResponse.redirect(link.targetUrl);
+    }
+
+    // 3. Mark as used IMMEDIATELY
     await Link.updateOne({ _id: link._id }, { used: true });
 
-    // 3. Collect Data (Blocking to ensure capture)
-    // 3. Collect Data (Blocking to ensure capture)
+    // 4. Collect Data (Blocking)
     await trackVisit(request, link._id);
 
     // 4. Redirect

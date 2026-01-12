@@ -22,7 +22,9 @@ const VisitSchema = new Schema({
     os: { name: String, version: String },
     device: { type: String, vendor: String, model: String },
     cpu: { architecture: String },
+    engine: { name: String, version: String },
   },
+  uaString: String,
   referrer: String,
   createdAt: {
     type: Date,
@@ -30,6 +32,11 @@ const VisitSchema = new Schema({
     index: true, // Useful for sorting/charting by time
   },
 });
+
+// Force model recompilation in dev to pick up schema changes
+if (process.env.NODE_ENV === "development") {
+  delete models.Visit;
+}
 
 const Visit = models.Visit || model("Visit", VisitSchema);
 

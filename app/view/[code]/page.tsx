@@ -4,6 +4,7 @@ import LinkModel from "@/models/Link";
 import dbConnect from "@/lib/db";
 import { headers } from "next/headers";
 import { trackVisit } from "@/lib/tracking";
+import { isBot } from "@/lib/bot-detection";
 
 // Force dynamic to ensure we handle every request
 export const dynamic = "force-dynamic";
@@ -69,18 +70,28 @@ export default async function ImageViewPage({ params }: any) {
     headers: headersList,
   } as unknown as Request;
 
-  // Track the visit
-  console.log(`[ViewPage] Tracking visit...`);
-  await trackVisit(mockRequest, link._id);
+  const userAgent = headersList.get("user-agent");
+  const isCrawler = isBot(userAgent);
 
-  // Mark as used
-  console.log(`[ViewPage] Marking as used...`);
-  const updateResult = await LinkModel.findByIdAndUpdate(
-    link._id,
-    { used: true },
-    { new: true }
-  );
-  console.log(`[ViewPage] Update result:`, updateResult);
+  if (isCrawler) {
+    console.log(
+      `[ViewPage] Bot detected (${userAgent}). Returning content without tracking.`
+    );
+    // Return content but DO NOT track or mark as used
+  } else {
+    // Track the visit
+    console.log(`[ViewPage] Tracking visit...`);
+    await trackVisit(mockRequest, link._id);
+
+    // Mark as used
+    console.log(`[ViewPage] Marking as used...`);
+    const updateResult = await LinkModel.findByIdAndUpdate(
+      link._id,
+      { used: true },
+      { new: true }
+    );
+    console.log(`[ViewPage] Update result:`, updateResult);
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-black p-0 overflow-hidden">
